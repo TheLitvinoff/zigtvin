@@ -31,9 +31,9 @@ dispatcher.add_handler(echo_handler)
 
 def whois(bot, update, args):
 	reply = "Даже не знаю, что ответить. :("
-	if "саша" in str.lower(args):
+	if "саша" in args or "Саша" in args:
 		reply = "Так все мы знаем, что Саша - козявка."
-	elif "слава" in str.lower(args):
+	elif "слава" in args or "Слава" in args:
 		reply = "Ну а Слава - молодец."
 
 	bot.send_message(chat_id=update.message.chat_id, text=reply)
