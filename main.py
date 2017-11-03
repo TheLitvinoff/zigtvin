@@ -18,7 +18,7 @@ dispatcher.add_handler(start_handler)
 def echo(bot, update):
 	if "саша" in str.lower(update.message.text):
 		bot.send_message(chat_id=update.message.chat_id, text="Так все мы знаем, что Саша - козявка.")
-	else if "слава" in str.lower(update.message.text):
+	elif "слава" in str.lower(update.message.text):
 		bot.send_message(chat_id=update.message.chat_id, text="Ну а Слава - молодец.")
 	else:
 		bot.send_message(chat_id=update.message.chat_id, text="Даже не знаю, что ответить. :(")
