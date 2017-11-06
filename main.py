@@ -28,6 +28,11 @@ def echo(bot, update):
 echo_handler = MessageHandler(Filters.text, echo)
 dispatcher.add_handler(echo_handler)
 
+def send_schedule_photo(bot, udpate):
+	bot.send_photo(chat_id=udpate.message.chat_id, photo=open('schedule.jpg', 'rb'))
+
+schedule_handler = CommandHandler('rasp', send_schedule_photo)
+dispatcher.add_handler(schedule_handler)
 
 def whois(bot, update, args):
 	reply = "Даже не знаю, что ответить. :("
