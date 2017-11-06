@@ -5,11 +5,14 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryH
 from schedule import handle_schedule, inline_callback_button, add_task
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-print('Hi, wanna give me some credentials? \n')
-bot_token = input('Your bot`s Token: ')
-db_username = input('Username: ')
-db_password = getpass.getpass('Password: ')
+print("     ********************************************************")
+print("     |                                                      |")
+print('     |              Telegram Zigtvin Bot                    |')
+print("     |                                                      |")
+print("     ********************************************************\n")
+bot_token = input('Bot`s Token: ')
+db_username = input('DB username: ')
+db_password = getpass.getpass('DB password: ')
 
 try:
 	updater = Updater(token=bot_token)
@@ -26,7 +29,7 @@ def echo(bot, update):
 	if hasattr(update.message, 'reply_to_message'):
 		orig_mes = update.message.reply_to_message.text
 		if 'Which task to add on' in orig_mes:
-			add_task(orig_mes[len(orig_mes)-4:len(orig_mes)-1], update.message.text)
+			add_task(bot, orig_mes[len(orig_mes)-4:len(orig_mes)-1], update.message.text, db_username, db_password, update.message.chat_id)
 	else:
 		bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that. :c")
 
