@@ -153,3 +153,4 @@ def get_tasksl_day(day, user_id, db_username, db_password):
 	cur.execute("SELECT * FROM users INNER JOIN weekday ON weekday.user_id = users.id INNER JOIN activity ON activity.weekday_id = weekday.id WHERE users.id = {} AND short_name = \'{}\'".format(user_id, day))
 	activities = tuple(cur.fetchall())
 	db.close()
+	
