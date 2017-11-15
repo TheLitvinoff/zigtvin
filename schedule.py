@@ -86,8 +86,8 @@ def handle_del_task(bot, query, chat_data):
 	if (query.data == 'del_task_ask_day'):
 		display_week_to_choose_callback(bot, query, 'del_task')
 	else:
-		if ('del_selected' in query.data):
-			delete_task(query.data[13:], chat_data, bot, query)
+		if ('del_task_selected' in query.data):
+			delete_task(query.data[18:], chat_data, bot, query)
 		else:
 			build_remove_markup_tasks_day(bot, query, chat_data)
 
@@ -98,7 +98,7 @@ def build_remove_markup_tasks_day(bot, query, chat_data):
 	for activity in activities:
 		activity_name = activity[9]
 		activity_id = activity[7]
-		keyboard.append([InlineKeyboardButton("{}".format(activity_name), callback_data="del_selected_{}".format(activity_id))])
+		keyboard.append([InlineKeyboardButton("{}".format(activity_name), callback_data="del_task_selected_{}".format(activity_id))])
 	reply_markup = InlineKeyboardMarkup(keyboard)
 	bot.edit_message_text(
 			chat_id=query.message.chat_id,
