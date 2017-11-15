@@ -2,6 +2,7 @@ import logging
 import telegram
 import getpass
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler, Filters
+from telegram import ReplyKeyboardMarkup
 import schedule
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -27,7 +28,8 @@ except:
     raise
 
 def start(bot, update):
-	reply_markup = telegram.ReplyKeyboardRemove()
+	custom_keyboard = [['/start', '/sc']]
+	reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
 	bot.send_message(chat_id=update.message.chat_id, text="I'm a bot, how can I help you?", reply_markup=reply_markup)
 
 def sc(bot, update, chat_data):

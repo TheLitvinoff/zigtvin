@@ -3,7 +3,7 @@ import sys
 import telegram
 import datetime
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ForceReply
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ForceReply, ReplyKeyboardMarkup
 
 def handle_schedule(bot, update, chat_data):
 	keyboard = [[InlineKeyboardButton("<< Main", callback_data='main_menu')],
@@ -26,7 +26,10 @@ def inline_callback_button(bot, update, chat_data):
 	elif 'del_sec' in query.data:
 		handle_del_section(bot, query, chat_data)
 	else:
-		bot.edit_message_text(text="Selected option: {}".format(query.data), chat_id=query.message.chat_id, message_id=query.message.message_id)
+		bot.answer_callback_query(query.id)
+		custom_keyboard = [['/start', '/sc']]
+		reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+		bot.send_message(text="I'm a bot, how can I help you?".format(query.data), chat_id=query.message.chat_id, reply_markup=reply_markup)
 
 def handle_add_section(bot, query, chat_data):
 	reply_markup = ForceReply(force_reply=True)
@@ -140,11 +143,15 @@ def handle_check_schedule(bot, query, chat_data):
 		days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 		if 'week' in query.data:
 			for day in days:
-				bot.send_message(chat_id=query.message.chat_id, text=show_task_day(day, query.message.chat_id, chat_data['db_username'], chat_data['db_password']), parse_mode=telegram.ParseMode.MARKDOWN)
+				custom_keyboard = [['/start', '/sc']]
+				reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+				bot.send_message(chat_id=query.message.chat_id, text=show_task_day(day, query.message.chat_id, chat_data['db_username'], chat_data['db_password']), parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
 				bot.answer_callback_query(query.id)
 		else:
 			weekno = datetime.datetime.today().weekday()
-			bot.send_message(chat_id=query.message.chat_id, text=show_task_day(days[weekno], query.message.chat_id, chat_data['db_username'], chat_data['db_password']), parse_mode=telegram.ParseMode.MARKDOWN)
+			custom_keyboard = [['/start', '/sc']]
+			reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+			bot.send_message(chat_id=query.message.chat_id, text=show_task_day(days[weekno], query.message.chat_id, chat_data['db_username'], chat_data['db_password']), parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
 			bot.answer_callback_query(query.id)
 
 
@@ -207,12 +214,40 @@ def get_or_create_weekday(db_user, db_passwd, user_id, day, short_name):
 	return weekday
 
 def show_task_day(day, user_id, db_username, db_password):
+	short_names = {
+		'mon': 'Monday',
+		'tue': 'Tuesday',
+		'wed': 'Wednesday',
+		'thu': 'Thursday',
+		'fri': 'Friday',
+		'sat': 'Saturday',
+		'sun': 'Sunday'
+	}
 	activities = get_tasks_day(day, user_id, db_username, db_password)
-	if len(activities) > 0:
-		activity = activities[0]
-		return "{} ------- {}".format(activity[5], activity[9])
-	return day
+	sections = []
+	message = "_{}_".format(short_names[day])
 
+	for activity in activities:
+		if activity[13] not in sections:
+			sections.append(activity[13])
+	
+	for section in sections:
+		formatted_section = format_section(section)
+		message = message + " \n "
+		message = message + " \n "
+		message = message + "`{}`".format(formatted_section)
+		message = message + " \n "
+		section_activities = list(filter((lambda act: act[13] == section), activities))
+		for section_activity in section_activities:
+			message = message + "{}".format(section_activity[9])
+			message = message + " \n "
+	return message
+
+def format_section(section):
+	result = ""
+	for letter in section:
+		result = result + letter.upper() + " "
+	return result
 
 def get_tasks_day(day, user_id, db_username, db_password):
 	db = MySQLdb.connect(host="localhost", user=db_username, passwd=db_password, db="schedule")
@@ -240,7 +275,9 @@ def delete_task(task_id, chat_data, bot, query):
 	cur.execute("DELETE FROM activity WHERE id = {}".format(task_id))
 	db.commit()
 	db.close()
-	bot.send_message(chat_id=query.message.chat_id, text="The task was successfully deleted")
+	custom_keyboard = [['/start', '/sc']]
+	reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+	bot.send_message(chat_id=query.message.chat_id, text="The task was successfully deleted", reply_markup=reply_markup)
 	bot.answer_callback_query(query.id)
 	return
 
@@ -250,8 +287,10 @@ def add_section(bot, section_text, db_username, db_password, user_id):
 	cur.execute("INSERT INTO section (user_id, name) VALUES ({}, \'{}\')".format(user_id, section_text))
 	db.commit()
 	db.close()
+	custom_keyboard = [['/start', '/sc']]
+	reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
 	bot.send_message(chat_id=user_id, text="*{}* section was successfully added.".format(section_text), 
-						parse_mode=telegram.ParseMode.MARKDOWN)
+						parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
 
 
 def delete_section(section_id, chat_data, bot, query):
@@ -262,6 +301,8 @@ def delete_section(section_id, chat_data, bot, query):
 	cur.execute("DELETE FROM section WHERE id = {}".format(section_id))
 	db.commit()
 	db.close()
-	bot.send_message(chat_id=query.message.chat_id, text="The section was successfully deleted")
+	custom_keyboard = [['/start', '/sc']]
+	reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+	bot.send_message(chat_id=query.message.chat_id, text="The section was successfully deleted", reply_markup=reply_markup)
 	bot.answer_callback_query(query.id)
 	return
