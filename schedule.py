@@ -178,7 +178,9 @@ def add_task(bot, day, section_id, task, db_user, db_passwd, user_id):
 			except:
 				db.rollback()
 			db.close()
-			bot.send_message(chat_id=user_id, text="*{}* was successfully added on *{}*".format(task, short_names[day]), parse_mode=telegram.ParseMode.MARKDOWN)
+			custom_keyboard = [['/start', '/sc']]
+			reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+			bot.send_message(chat_id=user_id, text="*{}* was successfully added on *{}*".format(task, short_names[day]), parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
 	return
 
 
